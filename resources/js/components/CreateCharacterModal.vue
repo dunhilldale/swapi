@@ -42,20 +42,21 @@ export default {
     },
     methods: {
         submit() {
-            console.log('form submitted!', this.form);
             fetch('/api/characters', {
-                method: 'POST',
+                method: 'post',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
                 body: JSON.stringify(this.form)
             }).then((result) => {
                 if(result.status === 201) {
                     console.log('character created successfully!');
+                    this.$emit('created');
                     this.$emit('close');
                 } else {
-                    console.error('error creating character', result);
+                    console.error('error creating character', result.statusText);
                 }
             }).catch((err) => {
                 console.error('error creating character', err);

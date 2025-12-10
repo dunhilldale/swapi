@@ -17,7 +17,7 @@
           <td>{{ p.height }}</td>
           <td>{{ p.mass }}</td>
           <td>
-            <button v-if="p.custom" @click="showAlert(p.id)" class="text-red-600">Delete</button>
+            <button v-if="p.custom" @click="remove(p.id)" class="text-red-600">Delete</button>
             <span v-else class="text-gray-400">—</span>
           </td>
         </tr>
@@ -30,50 +30,44 @@
 import CreateCharacterModal from './CreateCharacterModal.vue';
 
 export default {
-  components: { CreateCharacterModal },
-  data() {
-    return {
-      people: [],
-      showCreate: false,
-    }
-  },
-  mounted() {
-    this.fetchList();
-  },
-  methods: {
-    fetchList() {
-      fetch('/api/people')
-        .then(r => r.json())
-        .then(data => {
-          this.people = data;
-        });
+    components: { CreateCharacterModal },
+    data() {
+        return {
+            people: [],
+            showCreate: false,
+        }
     },
-    openCreate() {
-      this.showCreate = true;
+    mounted() {
+        this.fetchList();
     },
-    // confirmRemove(id) {
-    //   const confirmed = confirm('Delete this custom character?');
-    // },
-    showAlert(id) {
-        console.log(id);
-        alert('Delete this custom character? ' + id);
-    },
-    remove(id) {
-      const confirmed = confirm('Delete this custom character?');
-      if (!confirmed) return;
+    methods: {
+        fetchList() {
+            fetch('/api/people')
+            .then(r => r.json())
+            .then(data => {
+                this.people = data;
+            });
+        },
+        openCreate() {
+            this.showCreate = true;
+        },
+        remove(id) {
+            // const confirmed = confirm('Delete this custom character?');
+            // console.log('confirmed', confirmed);
+            // if (!confirmed) return;
 
-      fetch(`/api/characters/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            }
-        })
-        .then(r => r.json())
-        .then(() => {
-            this.fetchList();
-        })
-        .catch(err => console.error('Delete error:', err));
+            fetch(`/api/characters/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(r => r.json())
+            .then(() => {
+                this.fetchList();
+            })
+            .catch(err => console.error('Delete error:', err));
+        }
     }
-  }
 }
 </script>

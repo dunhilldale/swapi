@@ -51,8 +51,8 @@ class CharacterController extends Controller
             'name' => 'required|string|max:255',
             'gender' => 'nullable|string|max:50',
             'birth_year' => 'nullable|string|max:50',
-            'height' => 'nullable|string|max:50',
-            'mass' => 'nullable|string|max:50',
+            'height' => 'nullable|numeric|max:500',
+            'mass' => 'nullable|numeric|max:500',
         ]);
 
         $character = Character::create($data);
@@ -88,6 +88,18 @@ class CharacterController extends Controller
             } else {
                 $results[$cat] = [];
             }
+        }
+
+        // Search local database for people and merge
+        $localMapped = (Character::getByName($q))->map(function ($c) {
+            return array_merge($c->toArray(), ['custom' => true]);
+        })->toArray();
+
+        if (isset($results['people'])) {
+            // Prepend local results to SWAPI results
+            $results['people'] = array_merge($localMapped, $results['people']);
+        } else {
+            $results['people'] = $localMapped;
         }
 
         return response()->json($results);
